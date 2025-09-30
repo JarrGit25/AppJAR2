@@ -1,10 +1,26 @@
 package com.curso.AppJAR.mapa
 
 import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Looper
+import android.provider.Settings
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresPermission
+import androidx.core.app.ActivityCompat
+import com.curso.AppJAR.Constantes
 import com.curso.AppJAR.R
+import com.curso.AppJAR.databinding.ActivityMapsBinding
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -12,15 +28,27 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.curso.AppJAR.databinding.ActivityMapsBinding
+
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
-    // SERVICIO PARA LA UBICACIÓN (GPS, RED MOVIL O WIFI )
-    private lateinit var locationManager: LocationManager
-
+    private lateinit var locationManager: LocationManager //SERVICIO PARA LA UBICACIÓN (GPS, RED MÓVIL, WIFI)
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient //Objeto que realmente averigua mi ubicación
+    private lateinit var locationRequest: LocationRequest //Petición al objeto anterior
+    private lateinit var locationCallback: LocationCallback // función a la vuelta de la petición de ubicación
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
+
+    val laucherGpsActivation = registerForActivityResult(ActivityResultContracts.StartActivityForResult())
+    {
+        if (gpsActivado())
+        {
+            accederALaUbicacion()
+        } else {
+            Log.d(Constantes.ETIQUETA_LOG, "GPS DESACTIVADO")
+            Toast.makeText(this, "GPS DESACTIVADO - SIN ACCESO A LA UBICACIÓN", Toast.LENGTH_LONG).show()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,9 +60,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
-        // localización
         this.locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        //requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 646)
     }
 
     /**
@@ -54,8 +81,96 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
 
-        // SOLICITAMOS PERMISOS DE UBICACIONç
-        //requestPermissions(arrayOf(Manifest.permission.Acc))
+        //SOLICITAMOS PERMISOS DE UBICACIÓN
+        //requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 646)
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            Log.d(Constantes.ETIQUETA_LOG, "Con permisos para la ubicación")
+            if (gpsActivado())
+            {
+                accederALaUbicacion()
+            } else {
+                solicitarActivacion()
+            }
+
+        } else {
+            Log.d(Constantes.ETIQUETA_LOG, "Pido permisos para la ubicación")
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 646)
+        }
 
     }
+
+    fun gpsActivado (): Boolean
+    {
+        var gpsActivo = false
+
+        gpsActivo = this.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+
+        return gpsActivo
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
+        {
+            Log.d(Constantes.ETIQUETA_LOG, "Con permisos para la ubicación")
+            if (gpsActivado())
+            {
+                accederALaUbicacion()
+            } else {
+                solicitarActivacion()
+            }
+            //accedo a la ubicación
+            //else
+            //solicitar la activación del GPS
+        } else {
+            Log.d(Constantes.ETIQUETA_LOG, "SIN permisos para la ubicación")
+            Toast.makeText(this, "SIN ACCESO A LA UBICACIÓN", Toast.LENGTH_LONG).show()
+        }
+
+    }
+
+    private fun accederALaUbicacion() {
+        this.fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        this.locationRequest = LocationRequest.create()
+        this.locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+        this.locationRequest.setInterval(5000)
+        this.locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                if (null != locationResult) {
+                    var ultimaubicacion = locationResult.lastLocation
+                    Log.d(Constantes.ETIQUETA_LOG, "Ultima ubicación = $ultimaubicacion")
+                    this@MapsActivity.fusedLocationProviderClient.removeLocationUpdates(
+                        locationCallback
+                    )
+                }
+            }
+        }
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationProviderClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper()
+            )
+
+        }
+    }
+
+    fun solicitarActivacion() {
+        val intentActivacionGSP = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+        laucherGpsActivation.launch(intentActivacionGSP)
+    }
+
 }
