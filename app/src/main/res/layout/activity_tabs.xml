@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".tabs.TabsActivity">
+
+    <!-- 3 elementos -->
+    <!-- tab layout , viewpager -->
+    <!--(sera la seccion dinamica) y seccion fija debajo -->
+
+    <!-- PRIMERA SECCION LAS PESTAÑAS -->
+    <com.google.android.material.tabs.TabLayout
+
+        android:id="@+id/tablayout"
+        app:tabTextColor="@color/black"
+        app:tabSelectedTextColor="@color/miazul"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- dentro tenemos 3 pestañas -->
+        <com.google.android.material.tabs.TabItem
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PRIMERO" />
+
+        <com.google.android.material.tabs.TabItem
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SEGUNDO"/>
+
+        <com.google.android.material.tabs.TabItem
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TERCERO"/>
+
+    </com.google.android.material.tabs.TabLayout>
+
+    <!-- SEGUNDA SECCION -->
+    <!-- si quiero formato vertical añado -->
+    <!--android:orientation="vertical"-->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/vpt"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="8"
+        android:layout_margin="4dp"/>
+
+    <!-- TERCERA SECCION -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="2"
+        android:text="PARTE FIJA"
+        android:layout_margin="4dp"
+        android:background="@color/gris"
+        android:gravity="center"
+        android:textSize="40sp"/>
+
+</LinearLayout>

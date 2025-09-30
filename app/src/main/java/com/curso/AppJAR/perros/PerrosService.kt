@@ -1,0 +1,10 @@
+package com.curso.AppJAR.perros
+
+import retrofit2.http.GET
+import retrofit2.http.Path
+
+interface PerrosService {
+
+    @GET("api/breed/{raza}/images")
+    suspend fun obtenerFotosRaza(@Path("raza") raza:String): FotosRazaPerros
+}

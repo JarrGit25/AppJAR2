@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AppJAR</string>
+    <string name="sumar">SOMAR</string>
+    <string name="opcion">"OPÇÃO"</string>
+    <string name="calcular_imc">Calcular</string>
+    <string name="titulo_dialogo_salir">SALIR</string>
+    <string name="mensaje_dialogo_salir">Desea salir ?</string>
+    <string name="boton_si">SI</string>
+    <string name="boton_no">NO</string>
+    <string name="boton_neutro">CANCELAR</string>
+    <string name="mensaje_web_visita">Ver Web</string>
+</resources>

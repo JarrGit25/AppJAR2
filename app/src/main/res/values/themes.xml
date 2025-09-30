@@ -1,0 +1,13 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <!-- Para que aparezca la barra de estado debe estar quitado NoActionBar -->
+    <!--<style name="Base.Theme.AppJAR" parent="Theme.Material3.DayNight.NoActionBar">-->
+    <style name="Base.Theme.AppJAR" parent="Theme.Material3.DayNight">
+        <!-- Customize your light theme here. -->
+        <item name="colorPrimary">@color/miazul</item>
+        <!--<item name="colorSurface">@color/miactionbarcolor</item>-->
+    </style>
+
+    <style name="Theme.AppJAR" parent="Base.Theme.AppJAR" />
+    <style name="Theme.AppJAR.SinBarra" parent="Theme.Material3.DayNight.NoActionBar" />
+</resources>

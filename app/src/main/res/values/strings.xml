@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">AppJAR</string>
+    <string name="sumar">SUMAR</string>
+    <string name="opcion">opcion</string>
+    <string name="titulo_dialogo_salir">AVISO SALIR</string>
+    <string name="mensaje_dialogo_salir">¿Desea salir?</string>
+    <string name="boton_si">SI</string>
+    <string name="boton_no">NO</string>
+    <string name="boton_neutro">CANCELAR</string>
+    <string name="calcular_imc">CALCULAR IMC</string>
+    <string name="mensaje_web_visita">Ver Web</string>
+    <string name="title_activity_maps">MapsActivity</string>
+</resources>

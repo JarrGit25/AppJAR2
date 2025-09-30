@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- declaro que mi app necesita conectarse a internet -->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- PARA ACCEDER AL ESTADO DE LA RED -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- PERMISO PARA PODER LEER LOS CONTACTOS -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" /> <!-- PERMISOS PARA ACCEDRR A LA CAMARA DE FOTOS -->
+    <uses-permission android:name="android.permission.CAMERA" /> <!-- required = true si el dispositivo tiene que tener camara obligatoriamente -->
+
+    <!-- PERMISO A LOCALIZACION GPS (Localización fina) , RED MOVIL O WIFI-->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />  <!-- GPS -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />  <!-- WIFI o RED MOVIL -->
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <queries>
+
+        <!-- Declarar que quieres hacer consultas a aplicaciones de navegador para que sean visibles -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.AppJAR">
+
+        <!--
+             TODO: Before you run your application, you need a Google Maps API key.
+
+             To get one, follow the directions here:
+
+                https://developers.google.com/maps/documentation/android-sdk/get-api-key
+
+             Once you have your API key (it starts with "AIza"), define a new property in your
+             project's local.properties file (e.g. MAPS_API_KEY=Aiza...), and replace the
+             "YOUR_API_KEY" string in this file with "${MAPS_API_KEY}".
+        -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/map_api_key" />
+
+        <activity
+            android:name=".mapa.MapsActivity"
+            android:exported="false"
+            android:label="@string/title_activity_maps" />
+        <activity
+            android:name=".biometrico.HuellaActivity"
+            android:exported="false" />
+
+        <receiver
+            android:name=".receptor.inicioMovilReceiver"
+            android:enabled="true"
+            android:exported="true">
+
+            <!-- configura el receptor para programar que escucha o de que esta pendiente -->
+            <!-- reinicio completo -->
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name=".foto.FotoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".contactos.SeleccionContactoPermisosActivity"
+            android:exported="false" />
+        <activity
+            android:name=".contactos.SeleccionContactoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".canciones.BusquedaCancionesActivity"
+            android:exported="false"
+            android:label="Búsqueda de Canciones" />
+        <activity
+            android:name=".tabs.TabsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".perros.GaleriaPerrosActivity"
+            android:exported="false" />
+        <activity
+            android:name=".perros.PerrosActivity"
+            android:exported="false"
+            android:label="Galería de Perros" /> <!-- Para la primera actividad quitamos la barra -->
+        <!-- que es el tema que hemos definido Sin Barra -->
+        <activity
+            android:name=".productos.ListaProductosActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppJAR.SinBarra" />
+        <activity
+            android:name=".lista.ListaUsuariosActivity"
+            android:exported="false" />
+        <activity
+            android:name=".BienvenidaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".InflarActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SportsNewsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".BlackGameActivity"
+            android:exported="false" />
+        <activity
+            android:name=".VideoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SubColorActivity"
+            android:exported="false" />
+        <activity
+            android:name=".FormularioActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SpinnerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CompartirTextoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".WebViewActivity"
+            android:exported="true"
+            android:label="WEB ADF">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="adf-formacion.es"
+                    android:scheme="http" />
+                <data
+                    android:host="adf-formacion.es"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".BusquedaActivity"
+            android:exported="false"
+            android:label="Búsqueda en Google" />
+        <activity
+            android:name=".SumaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainMenuActivity"
+            android:exported="true">
+            <intent-filter>
+
+                <!-- con estas estiquetas, Android sabe que ésta es mi Actividad Principal (pantalla inicio) -->
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".CuadrosActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdivinaNumeroActivity"
+            android:exported="true"
+            android:label="Juego Adivina" />
+        <activity
+            android:name=".ImagenIMCActivity"
+            android:exported="false"
+            android:label="Cálculo IMC" />
+        <activity
+            android:name=".ImcActivity"
+            android:exported="true"
+            android:label="Cálculo IMC">
+
+            <!-- INICIO con estas estiquetas, Android sabe que ésta es mi Actividad Principal (pantalla inicio) -->
+            <!--
+            <intent-filter>
+
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            -->
+            <!-- FIN con estas estiquetas, Android sabe que ésta es mi Actividad Principal (pantalla inicio) -->
+        </activity>
+        <activity
+            android:name=".VersionesActivity"
+            android:exported="true">
+
+            <!-- esto es un comentario en XML / HTML -->
+            <!--
+            <intent-filter>
+
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            -->
+        </activity> <!-- para usar el FileProvider -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.curso.AppJAR"
+            android:exported="false"
+            android:grantUriPermissions="true">
+
+            <!-- ahora la correspondencia de las rutas que es el xml rutas_provider.xml -->
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/rutas_provider" />
+        </provider>
+    </application>
+
+</manifest>

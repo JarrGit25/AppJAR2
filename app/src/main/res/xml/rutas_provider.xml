@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+<!-- aqui va la correspondencia de nuestra ruta privada con una ruta logica-->
+    <files-path
+        name="fotoprivada"
+        path="/"/> <!-- ruta interna privada -->
+    <external-files-path
+        name="fotopublicaprivada"
+        path="/"/> <!-- ruta publico-privada "externa compartida" -->
+    <external-path
+        name="fotopublicadownload"
+        path="Download/"/> <!-- ruta publica "Download" -->
+</paths>

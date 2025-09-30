@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ESTA SERIA CONFIGURACION SOLO DESARROLLO -->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">192.168.1.100</domain> <!-- o localhost -->
+    </domain-config>
+</network-security-config>
+
+<!-- ESTA SERIA CONFIGURACION SERVIDOR -->
+<!--
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">tuservidor.com</domain>
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </domain-config>
+</network-security-config>
+-->
+

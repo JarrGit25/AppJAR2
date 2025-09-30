@@ -1,0 +1,33 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Fondo: VideoView a pantalla completa -->
+    <VideoView
+        android:id="@+id/videoView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:scaleType="centerCrop"
+        />
+
+    <Button
+        android:onClick="saltarPresentacion"
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Saltar Intro"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="150dp"/>
+
+    <!-- CheckBox a 100dp del fondo -->
+    <CheckBox
+        android:onClick="noVolverAMostrar"
+        android:id="@+id/checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No volver a mostrar"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="100dp"/>
+
+</FrameLayout>
