@@ -3,12 +3,16 @@ package com.curso.AppJAR.mapa
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Geocoder
+import android.location.Location
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
+import android.view.MotionEvent
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresPermission
@@ -28,6 +32,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import java.util.Locale
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -43,6 +48,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     {
         if (gpsActivado())
         {
+            Log.d(Constantes.ETIQUETA_LOG, "GPS ACTIVADO")
             accederALaUbicacion()
         } else {
             Log.d(Constantes.ETIQUETA_LOG, "GPS DESACTIVADO")
@@ -50,11 +56,36 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    //private var dX = 0f
+    //private var dY = 0f
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Acceso directo al botón
+        /*
+        binding.floatingActionButton.setOnTouchListener { view, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    dX = view.x - event.rawX
+                    dY = view.y - event.rawY
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    view.animate()
+                        .x(event.rawX + dX)
+                        .y(event.rawY + dY)
+                        .setDuration(0)
+                        .start()
+                    true
+                }
+                else -> false
+            }
+        }
+        */
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
@@ -83,23 +114,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         //SOLICITAMOS PERMISOS DE UBICACIÓN
         //requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 646)
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            Log.d(Constantes.ETIQUETA_LOG, "Con permisos para la ubicación")
-            if (gpsActivado())
-            {
-                accederALaUbicacion()
-            } else {
-                solicitarActivacion()
-            }
+        /* if (ActivityCompat.checkSelfPermission(
+                 this,
+                 Manifest.permission.ACCESS_FINE_LOCATION
+             ) == PackageManager.PERMISSION_GRANTED
+         ) {
+             Log.d(Constantes.ETIQUETA_LOG, "Con permisos para la ubicación")
+             if (gpsActivado())
+             {
+                 Log.d(Constantes.ETIQUETA_LOG, "GPS ACTIVADO")
+                 accederALaUbicacion()
+             } else {
+                 Log.d(Constantes.ETIQUETA_LOG, "GPS DESACTIVADO")
+                 solicitarActivacion()
+             }
 
-        } else {
-            Log.d(Constantes.ETIQUETA_LOG, "Pido permisos para la ubicación")
-            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 646)
-        }
+         } else {
+             Log.d(Constantes.ETIQUETA_LOG, "Pido permisos para la ubicación")
+             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 646)
+         }*/
 
     }
 
@@ -149,7 +182,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     Log.d(Constantes.ETIQUETA_LOG, "Ultima ubicación = $ultimaubicacion")
                     this@MapsActivity.fusedLocationProviderClient.removeLocationUpdates(
                         locationCallback
+
                     )
+                    this@MapsActivity.mostrarUbicacion(locationResult.lastLocation)
                 }
             }
         }
@@ -164,13 +199,44 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 locationCallback,
                 Looper.getMainLooper()
             )
-
+            Log.d(Constantes.ETIQUETA_LOG, "Petición realizada")
         }
     }
 
+    fun mostrarDireccionPostal (ubicacion:Location)
+    {
+        val geocoder = Geocoder(this, Locale("es"))
+
+        val direcciones = geocoder.getFromLocation(ubicacion.latitude, ubicacion.longitude, 1)
+
+        if (direcciones!=null && direcciones.size>0)
+        {
+            val direccion = direcciones[0]
+            val toast = "Dirección obtenida = ${direccion.getAddressLine(0)} CP = ${direccion.postalCode} LOCALIDAD = ${direccion.locality}"
+            Log.d(Constantes.ETIQUETA_LOG, toast)
+            Toast.makeText(this, toast, Toast.LENGTH_LONG).show()
+        }
+
+    }
+
+    fun mostrarUbicacion (location: Location)
+    {
+        val ubicacionActual = LatLng(location.latitude, location.longitude)
+        this.mMap.addMarker(MarkerOptions().position(ubicacionActual).title("Estoy aquí"))
+        this.mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ubicacionActual, 20f))
+        //this.mMap.mapType = GoogleMap.MAP_TYPE_SATELLITE
+        this.mMap.mapType = GoogleMap.MAP_TYPE_HYBRID
+        //this.mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+        mostrarDireccionPostal(location)
+
+    }
     fun solicitarActivacion() {
         val intentActivacionGSP = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
         laucherGpsActivation.launch(intentActivacionGSP)
+    }
+
+    fun mostrarUbicacionMapa(view: View) {
+        requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 646)
     }
 
 }
