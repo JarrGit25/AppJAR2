@@ -8,10 +8,9 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.READ_CONTACTS" /> <!-- PERMISOS PARA ACCEDRR A LA CAMARA DE FOTOS -->
     <uses-permission android:name="android.permission.CAMERA" /> <!-- required = true si el dispositivo tiene que tener camara obligatoriamente -->
-
-    <!-- PERMISO A LOCALIZACION GPS (Localización fina) , RED MOVIL O WIFI-->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />  <!-- GPS -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />  <!-- WIFI o RED MOVIL -->
+    <!-- PERMISO A LOCALIZACION GPS (Localización fina) , RED MOVIL O WIFI -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- GPS -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- WIFI o RED MOVIL -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <uses-feature
@@ -45,7 +44,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppJAR">
+        <receiver
+            android:name=".receptor.FinServicioReceiver"
+            android:enabled="true"
+            android:exported="true"></receiver>
 
+        <service
+            android:name=".servicios.NumAleatorioService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity
+            android:name=".memorygame.MemoryGameActivity"
+            android:exported="false" />
         <!--
              TODO: Before you run your application, you need a Google Maps API key.
 

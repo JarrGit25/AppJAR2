@@ -56,8 +56,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    //private var dX = 0f
-    //private var dY = 0f
+    var dX = 0f
+    var dY = 0f
+    var downRawX = 0f
+    var downRawY = 0f
+    val clickThreshold = 10
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,13 +68,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Acceso directo al botón
-        /*
+        // Acceso directo al botón dragable
         binding.floatingActionButton.setOnTouchListener { view, event ->
-            when (event.action) {
+            when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
-                    dX = view.x - event.rawX
-                    dY = view.y - event.rawY
+                    downRawX = event.rawX
+                    downRawY = event.rawY
+                    dX = view.x - downRawX
+                    dY = view.y - downRawY
                     true
                 }
                 MotionEvent.ACTION_MOVE -> {
@@ -82,10 +86,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         .start()
                     true
                 }
+                MotionEvent.ACTION_UP -> {
+                    val upRawX = event.rawX
+                    val upRawY = event.rawY
+
+                    val deltaX = Math.abs(upRawX - downRawX)
+                    val deltaY = Math.abs(upRawY - downRawY)
+
+                    if (deltaX < clickThreshold && deltaY < clickThreshold) {
+                        // Es un click, no un drag
+                        view.performClick() // Ejecuta el onClick del botón
+                    }
+
+                    true
+                }
                 else -> false
             }
         }
-        */
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
@@ -236,7 +253,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     fun mostrarUbicacionMapa(view: View) {
-        requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 646)
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (gpsActivado()) {
+                accederALaUbicacion()
+            } else {
+                solicitarActivacion()
+            }
+        } else {
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 646)
+        }
     }
 
 }
