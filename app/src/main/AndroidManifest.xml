@@ -6,8 +6,13 @@
     <uses-permission android:name="android.permission.INTERNET" /> <!-- PARA ACCEDER AL ESTADO DE LA RED -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- PERMISO PARA PODER LEER LOS CONTACTOS -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.READ_CONTACTS" /> <!-- PERMISOS PARA ACCEDRR A LA CAMARA DE FOTOS -->
     <uses-permission android:name="android.permission.CAMERA" /> <!-- required = true si el dispositivo tiene que tener camara obligatoriamente -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- permitimos que nuesta app se informe del inicio del dispositivo -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" /> <!-- dicen q no existe pero te quita el rojo en AS añado por siacaso necesario para poco -->
     <!-- PERMISO A LOCALIZACION GPS (Localización fina) , RED MOVIL O WIFI -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- GPS -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- WIFI o RED MOVIL -->
@@ -52,7 +57,8 @@
         <service
             android:name=".servicios.NumAleatorioService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true"
+            android:foregroundServiceType="dataSync"/>
 
         <activity
             android:name=".memorygame.MemoryGameActivity"

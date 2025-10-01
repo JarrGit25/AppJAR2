@@ -65,6 +65,7 @@ class MainMenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSel
 
         mostrarAPPSinstaladas()
         gestionarPermisosNotis ()
+        // lanzarAlarma()
     }
 
 //    // creo Intent para enviar texto
