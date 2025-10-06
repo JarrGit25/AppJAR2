@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <!-- declaro que mi app necesita conectarse a internet -->
     <uses-permission android:name="android.permission.INTERNET" /> <!-- PARA ACCEDER AL ESTADO DE LA RED -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- PERMISO PARA PODER LEER LOS CONTACTOS -->
@@ -10,6 +9,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.READ_CONTACTS" /> <!-- PERMISOS PARA ACCEDRR A LA CAMARA DE FOTOS -->
     <uses-permission android:name="android.permission.CAMERA" /> <!-- required = true si el dispositivo tiene que tener camara obligatoriamente -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- permitimos que nuesta app se informe del inicio del dispositivo -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" /> <!-- dicen q no existe pero te quita el rojo en AS añado por siacaso necesario para poco -->
@@ -17,6 +17,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- GPS -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- WIFI o RED MOVIL -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -37,8 +38,6 @@
         </intent>
     </queries>
 
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -49,16 +48,36 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppJAR">
+        <activity
+            android:name=".alarma.AjusteAlarmaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".fechayhora.SeleccionFechaYHoraActivity"
+            android:exported="false" />
+        <activity
+            android:name=".servicios.PlayActivity"
+            android:exported="false" />
+
+        <service
+            android:name=".servicios.PlayService"
+            android:enabled="true"
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback" />
+
+        <receiver android:name=".servicios.PlayService$NotificationCloseButtonHandler" />
+        <receiver android:name=".servicios.PlayService$NotificationPlayButtonHandler" />
+        <receiver android:name=".servicios.PlayService$NotificationPrevButtonHandler" />
+        <receiver android:name=".servicios.PlayService$NotificationSkipButtonHandler" />
         <receiver
             android:name=".receptor.FinServicioReceiver"
             android:enabled="true"
-            android:exported="true"></receiver>
+            android:exported="true" />
 
         <service
             android:name=".servicios.NumAleatorioService"
             android:enabled="true"
             android:exported="true"
-            android:foregroundServiceType="dataSync"/>
+            android:foregroundServiceType="dataSync" />
 
         <activity
             android:name=".memorygame.MemoryGameActivity"

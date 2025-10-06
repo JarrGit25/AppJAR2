@@ -1,6 +1,5 @@
 package com.curso.AppJAR.notificaciones
 
-import android.annotation.TargetApi
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -20,9 +19,15 @@ import com.curso.AppJAR.Constantes
 
 object Notificaciones {
 
-    // dos atributos necesarios para definir al canal
+    // necesarios para definir al canal
     val NOTIFICATION_CHANNEL_ID = "UNO"
     val NOTIFICATION_CHANNEL_NAME = "CANAL_ADF"
+
+    //val NOTIFICATION_CHANNEL_ID2 = "DOS"
+    //val NOTIFICATION_CHANNEL_NAME2 = "CANAL_ADF_FGS_ALARMA"
+
+    val NOTIFICATION_CHANNEL_ID3 = "TRES"
+    val NOTIFICATION_CHANNEL_NAME3 = "CANAL_ADF_FGS_PLAY"
 
     // CON estas anotaciones puedo usar cosas de la version indicada dentro de la funcion
     // ademas con Requires valida que la funcion llamante se haga
@@ -30,7 +35,7 @@ object Notificaciones {
     // con TargetApi indicamos que a partir de esa version
     //@TargetApi(Build.VERSION_CODES.O) // si la version es OREO
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun crearCanalNotificacion ( context: Context
+    fun crearCanalNotificacion ( context: Context
     ): NotificationChannel?
     {
         var notificationChannel : NotificationChannel? = null
@@ -64,6 +69,24 @@ object Notificaciones {
         notificationChannel.lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
 
         return notificationChannel
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun crearCanalNotificacionForegroundService (context:Context, id: String, nombre:String): NotificationChannel {
+        var notificationChannel : NotificationChannel? = null
+
+
+
+        notificationChannel = NotificationChannel(
+            id,
+            nombre,
+            NotificationManager.IMPORTANCE_LOW  // IMPORTANTE: usa LOW para servicios persistentes
+        )
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(notificationChannel)
+
+        return notificationChannel
+
     }
 
     // recibe el contexto
@@ -125,7 +148,7 @@ object Notificaciones {
             val nc = crearCanalNotificacion( context)
             notificationManager.createNotificationChannel(nc!!) //creo nc si ya existe??
         }
-        nb = NotificationCompat.Builder(context, Notificaciones.NOTIFICATION_CHANNEL_ID)
+        nb = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
 
         nb.setPriority(NotificationCompat.PRIORITY_DEFAULT)
         nb.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

@@ -148,6 +148,18 @@
             android:orderInCategory="24"
             android:title="MAPA"
             />
+        <item
+            android:icon="@drawable/outline_arrow_forward_ios_24"
+            app:showAsAction="always"
+            android:orderInCategory="25"
+            android:title="PLAYSERVICE"
+            />
+        <item
+            android:icon="@drawable/outline_arrow_forward_ios_24"
+            app:showAsAction="always"
+            android:orderInCategory="26"
+            android:title="Fecha y Hora"
+            />
     </menu>
 </item>
     <item android:title="EJERCICIOS AVANZADOS">

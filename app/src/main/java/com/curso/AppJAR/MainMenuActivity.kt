@@ -1,6 +1,7 @@
 package com.curso.AppJAR
 
 import android.annotation.TargetApi
+import android.content.ComponentName
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -9,22 +10,36 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.MenuItem
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.edit
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.curso.AppJAR.biometrico.HuellaActivity
 import com.curso.AppJAR.canciones.BusquedaCancionesActivity
 import com.curso.AppJAR.contactos.SeleccionContactoActivity
 import com.curso.AppJAR.contactos.SeleccionContactoPermisosActivity
+import com.curso.AppJAR.fechayhora.SeleccionFechaYHoraActivity
 import com.curso.AppJAR.foto.FotoActivity
 import com.curso.AppJAR.lista.ListaUsuariosActivity
 import com.curso.AppJAR.mapa.MapsActivity
 import com.curso.AppJAR.perros.PerrosActivity
 import com.curso.AppJAR.productos.ListaProductosActivity
+import com.curso.AppJAR.servicios.PlayActivity
 import com.curso.AppJAR.tabs.TabsActivity
+import com.curso.AppJAR.worker.MiTareaProgramada
 import com.google.android.material.navigation.NavigationView
+import java.text.SimpleDateFormat
+import java.util.concurrent.TimeUnit
 
 /**
  * ESTA ES LA ACTIVIDAD DE INICIO
@@ -39,11 +54,29 @@ class MainMenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSel
     lateinit var navigationView: NavigationView
     // para trabajar con los estados de visibilidad del menu
     var menuVisible: Boolean = false
+    var launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+        Log.d(Constantes.ETIQUETA_LOG, "Volviendo de Ajustes Autonicio")
+        val ficherop = getSharedPreferences("ajustes", MODE_PRIVATE)
+        //ficherop.edit().putBoolean("INICIO_AUTO", true).commit()
+        //ponemos alarma a true la primera vez
+        ficherop.edit(true){
+            putBoolean("INICIO_AUTO", true)
+            putBoolean("ALARMA", false)
+        }
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main_menu)
+
+        val ficherop = getSharedPreferences("ajustes", MODE_PRIVATE)
+        val inicio_auto = ficherop.getBoolean("INICIO_AUTO", false)
+        if (!inicio_auto) {
+            //PRIMERA VEZ
+            solicitarInicioAutomatico()
+        }
 
         // Inicializo las dos vistas
         this.drawerLayout = findViewById<DrawerLayout>(R.id.drawer)
@@ -63,9 +96,10 @@ class MainMenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSel
         //val intent = Intent(this,ImcActivity::class.java)
         //startActivity(intent)
 
-        mostrarAPPSinstaladas()
-        gestionarPermisosNotis ()
+        //mostrarAPPSinstaladas()
+        gestionarPermisosNotis()
         // lanzarAlarma()
+        lanzarWorkManager()
     }
 
 //    // creo Intent para enviar texto
@@ -109,127 +143,137 @@ class MainMenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSel
             1 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
                 // intent nos sirve para navegar a otra actividad
-                val intent:Intent = Intent(this,VersionesActivity::class.java)
+                val intent = Intent(this,VersionesActivity::class.java)
                 // navega hacia la actividad
                 startActivity(intent)
             }
             2 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
-                val intent:Intent = Intent(this,AdivinaNumeroActivity::class.java)
+                val intent = Intent(this,AdivinaNumeroActivity::class.java)
                 startActivity(intent)
             }
             3 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
-                val intent:Intent = Intent(this,ImcActivity::class.java)
+                val intent = Intent(this,ImcActivity::class.java)
                 startActivity(intent)
             }
             4 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
-                val intent:Intent = Intent(this,CuadrosActivity::class.java)
+                val intent = Intent(this,CuadrosActivity::class.java)
                 startActivity(intent)
             }
             5 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
-                val intent:Intent = Intent(this,SumaActivity::class.java)
+                val intent = Intent(this,SumaActivity::class.java)
                 startActivity(intent)
             }
             6 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
-                val intent:Intent = Intent(this, BusquedaActivity::class.java)
+                val intent = Intent(this, BusquedaActivity::class.java)
                 startActivity(intent)
             }
             7 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
                 //val intenImplicito = Intent(Intent.ACTION_VIEW, "https://adf-formacion.es/".toUri()) // Intent Implicito
 
-                val intent:Intent = Intent(this, WebViewActivity::class.java)  // Intent Explicito
+                val intent = Intent(this, WebViewActivity::class.java)  // Intent Explicito
                 //startActivity(Intent.createChooser(intenImplicito, "ELIGE la APP para ver la web de ADF"))
                 startActivity(intent)
             }
 
             8 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
-                val intent:Intent = Intent(this, CompartirTextoActivity::class.java)
+                val intent = Intent(this, CompartirTextoActivity::class.java)
                 startActivity(intent)
             }
             9 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
-                val intent:Intent = Intent(this, SpinnerActivity::class.java)
+                val intent = Intent(this, SpinnerActivity::class.java)
                 startActivity(intent)
             }
             10 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
-                val intent:Intent = Intent(this, FormularioActivity::class.java)
+                val intent = Intent(this, FormularioActivity::class.java)
                 startActivity(intent)
             }
             11 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
-                val intent:Intent = Intent(this, VideoActivity::class.java)
+                val intent = Intent(this, VideoActivity::class.java)
                 startActivity(intent)
             }
             12 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
-                val intent:Intent = Intent(this, BlackGameActivity::class.java)
+                val intent = Intent(this, BlackGameActivity::class.java)
                 startActivity(intent)
             }
             13 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
-                val intent:Intent = Intent(this, SportsNewsActivity::class.java)
+                val intent = Intent(this, SportsNewsActivity::class.java)
                 startActivity(intent)
             }
             14 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
-                val intent:Intent = Intent(this, InflarActivity::class.java)
+                val intent = Intent(this, InflarActivity::class.java)
                 startActivity(intent)
             }
             15 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
-                val intent:Intent = Intent(this, ListaUsuariosActivity::class.java)
+                val intent = Intent(this, ListaUsuariosActivity::class.java)
                 startActivity(intent)
             }
             16 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
-                val intent:Intent = Intent(this, ListaProductosActivity::class.java)
+                val intent = Intent(this, ListaProductosActivity::class.java)
                 startActivity(intent)
             }
             17 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
-                val intent:Intent = Intent(this, PerrosActivity::class.java)
+                val intent = Intent(this, PerrosActivity::class.java)
                 startActivity(intent)
             }
             18 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
-                val intent:Intent = Intent(this, TabsActivity::class.java)
+                val intent = Intent(this, TabsActivity::class.java)
                 startActivity(intent)
             }
             19 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
-                val intent:Intent = Intent(this, BusquedaCancionesActivity::class.java)
+                val intent = Intent(this, BusquedaCancionesActivity::class.java)
                 startActivity(intent)
             }
             20 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
-                val intent:Intent = Intent(this, SeleccionContactoActivity::class.java)
+                val intent = Intent(this, SeleccionContactoActivity::class.java)
                 startActivity(intent)
             }
             21 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
-                val intent:Intent = Intent(this, SeleccionContactoPermisosActivity::class.java)
+                val intent = Intent(this, SeleccionContactoPermisosActivity::class.java)
                 startActivity(intent)
             }
             22 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
-                val intent:Intent = Intent(this, FotoActivity::class.java)
+                val intent = Intent(this, FotoActivity::class.java)
                 startActivity(intent)
             }
             23 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
-                val intent:Intent = Intent(this, HuellaActivity::class.java)
+                val intent = Intent(this, HuellaActivity::class.java)
                 startActivity(intent)
             }
             24 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
-                val intent:Intent = Intent(this, MapsActivity::class.java)
+                val intent = Intent(this, MapsActivity::class.java)
+                startActivity(intent)
+            }
+            25 -> {
+                Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
+                val intent = Intent(this, PlayActivity::class.java)
+                startActivity(intent)
+            }
+            26 -> {
+                Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
+                val intent = Intent(this, SeleccionFechaYHoraActivity::class.java)
                 startActivity(intent)
             }
 
@@ -237,6 +281,62 @@ class MainMenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSel
 
 
         return true
+    }
+
+    fun lanzarWorkManager ()
+    {
+        //definimos restricciones
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.UNMETERED) // solo Wi-Fi
+            .setRequiresBatteryNotLow(true)               // no ejecutar con batería baja
+            //.setRequiresCharging(true)                    // solo cuando esté cargando
+            .build()
+
+        //pasamos datos de entrada
+        val inputData = workDataOf("USER_ID" to "12345")
+
+        //creamos el trabajo periódico (la petición) con los datos y restricciones anteriores
+        val periodicWorkRequest = PeriodicWorkRequestBuilder<MiTareaProgramada>(
+            15, TimeUnit.MINUTES // Periodicidad mínima: 15 minutos
+        )
+            .setConstraints(constraints)
+            .setInputData(inputData)
+            .build()
+
+        //encolamos la petición
+        WorkManager.getInstance(this)
+            .enqueueUniquePeriodicWork(
+                "MiTareaProgramada",                       // Nombre único
+                ExistingPeriodicWorkPolicy.KEEP,        // No reemplazar si ya existe
+                periodicWorkRequest
+            )
+
+        val tiempo = System.currentTimeMillis()+(60*1000*15) //(30*1000)//15 minutos
+        //val tiempo = System.currentTimeMillis()+(1*1000) //(30*1000)//15 minutos
+        val dateformatter = SimpleDateFormat("E dd/MM/yyyy ' a las ' hh:mm:ss")
+        val mensaje = dateformatter.format(tiempo)
+        Log.d(Constantes.ETIQUETA_LOG, "ALARMA PROGRAMADA PARA $mensaje")
+        Toast.makeText(this, "Alarma programada para $mensaje", Toast.LENGTH_LONG).show()
+
+    }
+
+    private fun solicitarInicioAutomatico() {
+        val manufacturer = Build.MANUFACTURER
+        try {
+            val intent = Intent()
+            if ("xiaomi".equals(manufacturer, ignoreCase = true)) {
+                intent.setComponent(
+                    ComponentName(
+                        "com.miui.securitycenter",
+                        "com.miui.permcenter.autostart.AutoStartManagementActivity"
+                    )
+                )
+            }
+
+            launcher.launch(intent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     fun mostrarAPPSinstaladas ()
