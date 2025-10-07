@@ -45,18 +45,23 @@ Dentro del package otra carpeta para meter el entity --> la llamamos entity
 	Dentro de esta una DataClass Persona
 
 La estructura Quedaría : 	basedatos (carpeta)
-														adapter (carpeta)
+							adapter (carpeta)
+							    AdapterPersonas (clase de Kotlin)
+							    PersonaVH (Clase de Kotlin)
                             dao (carpeta donde iran las operaciones)
                             		PersonaDao (Interfaz Kotlin donde iran descritas las operaciones)
                             db (carpeta)
                             		AppDatabase (clase de Kotlin)
                             entity (capeta)
                             		Persona (Data class de Kotlin)
-                            BaseDatosActivity.kt (Actividad)
                             repository (carpeta Package)
                                     Repositorio (Clase normal de kotlin )
                             viewmodel (carpeta package)
                                     PersonaViewModel (Clase normal de kotlin)
+                            BaseDatosActivity.kt (Actividad)
+
+  En la parte del Layout tenemos el layout de la actividad "activity_base_datos.xml
+  y fila_persona.xml para el reciclerView
  */
 
 class BaseDatosActivity : AppCompatActivity() {
