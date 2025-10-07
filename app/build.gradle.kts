@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("kotlin-parcelize")
+    id("com.google.devtools.ksp")
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
 }
 
@@ -39,6 +40,9 @@ android {
                 "proguard-rules.pro"
             )
         }
+        debug {
+            buildConfigField("Boolean", "ROOM_LOGGING", "true")
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -50,6 +54,7 @@ android {
 
     buildFeatures {
         viewBinding=true
+        buildConfig=true
     }
 }
 
@@ -70,6 +75,10 @@ dependencies {
     implementation(libs.androidx.biometric.ktx)
     implementation(libs.play.services.maps)
     implementation(libs.play.services.location)
+    implementation(libs.androidx.lifecycle.livedata)
+    implementation(libs.androidx.room.common)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.work.runtime.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

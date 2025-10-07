@@ -24,6 +24,7 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import com.curso.AppJAR.basedatos.BaseDatosActivity
 import com.curso.AppJAR.biometrico.HuellaActivity
 import com.curso.AppJAR.canciones.BusquedaCancionesActivity
 import com.curso.AppJAR.contactos.SeleccionContactoActivity
@@ -274,6 +275,11 @@ class MainMenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSel
             26 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
                 val intent = Intent(this, SeleccionFechaYHoraActivity::class.java)
+                startActivity(intent)
+            }
+            27 -> {
+                Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
+                val intent = Intent(this, BaseDatosActivity::class.java)
                 startActivity(intent)
             }
 
