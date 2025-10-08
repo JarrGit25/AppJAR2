@@ -1,9 +1,11 @@
 package com.curso.AppJAR.basedatos.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
+import com.curso.AppJAR.Constantes
 import com.curso.AppJAR.basedatos.db.AppDatabase
 import com.curso.AppJAR.basedatos.entity.Persona
 import com.curso.AppJAR.basedatos.repository.Repositorio
@@ -46,4 +48,12 @@ class PersonaViewModel(application: Application):AndroidViewModel(application)
                 repository.borrar(persona)
             }
         }
+
+    fun contarPersonas() {
+        viewModelScope.launch {
+            val nper = repository.contarPersonas()
+            Log.d(Constantes.ETIQUETA_LOG, "numpersonas  $nper")
+        }
+    }
+
 }

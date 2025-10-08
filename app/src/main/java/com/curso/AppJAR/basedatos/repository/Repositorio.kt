@@ -21,4 +21,9 @@ class Repositorio (private val personaDao: PersonaDao){
         personaDao.borrar(persona)
     }
 
+    suspend fun contarPersonas():Int
+    {
+        return personaDao.countPersonas()
+    }
+
 }

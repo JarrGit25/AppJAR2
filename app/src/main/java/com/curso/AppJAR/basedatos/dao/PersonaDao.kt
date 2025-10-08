@@ -31,4 +31,7 @@ interface PersonaDao {
     // tiene que ser de tipo LiveData
     @Query("SELECT * FROM personas ORDER BY nombre ASC")
     fun obtenerTodas():LiveData<List<Persona>>
+
+    @Query("SELECT COUNT(*) FROM personas")
+    suspend fun countPersonas(): Int
 }

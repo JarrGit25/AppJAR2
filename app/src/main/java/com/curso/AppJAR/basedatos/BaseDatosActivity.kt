@@ -1,20 +1,28 @@
 package com.curso.AppJAR.basedatos
 
+import android.content.DialogInterface
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.curso.AppJAR.Constantes
 import com.curso.AppJAR.R
 import com.curso.AppJAR.basedatos.adapter.AdapterPersonas
 import com.curso.AppJAR.basedatos.entity.Persona
 import com.curso.AppJAR.basedatos.viewmodel.PersonaViewModel
 import com.curso.AppJAR.databinding.ActivityBaseDatosBinding
+import com.google.android.material.snackbar.Snackbar
 
 /*
 1 ) //añadimos esta línea en plugins del gradle del proyecto manualmente
@@ -85,6 +93,10 @@ class BaseDatosActivity : AppCompatActivity() {
         binding.recview.adapter = adapterPersonas
         binding.recview.layoutManager = LinearLayoutManager(this)
 
+        // para poder borrar un elemento de la lista
+        val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
+        itemTouchHelper.attachToRecyclerView(binding.recview)
+
         //ligamos las actualizaciones autómaticas de la lista
         personaViewModel.personas.observe(this, Observer {
             personas ->
@@ -96,15 +108,158 @@ class BaseDatosActivity : AppCompatActivity() {
             }
         })
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
     }
 
     // llamamos al ViewModel desde la funcion insertarPersona
     fun insertarPersona(view: View) {
         personaViewModel.insertar(Persona(nombre="Andrés", edad=25))
+        personaViewModel.contarPersonas()
     }
+
+    fun alertaborrado(): Boolean {
+
+        // prepara el AlertDialog
+        var alerta = AlertDialog.Builder(this)
+            .setTitle("Atención") // i18n
+            .setMessage("¿Desea Eliminar el registro?") // i18n
+            .setIcon(R.drawable.outline_chevron_forward_24)
+            .setPositiveButton(R.string.boton_si){ dialogo, opcion ->
+                this.finish();
+            }
+            .setNegativeButton(R.string.boton_no){ dialogo: DialogInterface, opcion: Int ->
+                dialogo.dismiss()
+            }
+            .setNeutralButton (R.string.boton_neutro){ dialogo: DialogInterface, opcion: Int ->
+                dialogo.cancel()
+            }
+
+        alerta.show() // Ahora muestra el AlertDialog
+
+        return true
+    }
+
+
+    val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+        override fun onMove(
+            recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder
+        ): Boolean {
+            return false // No necesitamos mover los elementos, solo manejar el deslizamiento
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            val position = viewHolder.adapterPosition
+            val persona = this@BaseDatosActivity.adapterPersonas.listaPersonas[position] // Método que debes crear en tu adaptador
+
+
+            //////////////////////////////////////////////
+            // prepara el AlertDialog
+            var alerta = AlertDialog.Builder(this@BaseDatosActivity)
+                .setTitle("Atención") // i18n
+                .setMessage("¿Desea Eliminar el registro?") // i18n
+                .setIcon(R.drawable.outline_chevron_forward_24)
+                .setPositiveButton(R.string.boton_si){ dialogo, opcion ->
+                    // Aquí es donde eliminamos el ítem
+                    personaViewModel.borrar(persona)
+
+                    // Mostrar Snackbar para deshacer la eliminación
+                    Snackbar.make(this@BaseDatosActivity.binding.recview, "Persona eliminada", Snackbar.LENGTH_LONG)
+                        .setAction("Deshacer") {
+                            // Si el usuario quiere deshacer, simplemente reinsertamos el ítem
+                            personaViewModel.insertar(persona)
+                        }
+                        .show()
+                }
+                .setNegativeButton(R.string.boton_no){ dialogo: DialogInterface, opcion: Int ->
+                    dialogo.dismiss()
+                    // con esto repinto el recicler a lo bestia
+                    adapterPersonas.notifyDataSetChanged()
+                }
+                .setNeutralButton (R.string.boton_neutro){ dialogo: DialogInterface, opcion: Int ->
+                    dialogo.cancel()
+                    // con esto repinto el recicler a lo bestia
+                    adapterPersonas.notifyDataSetChanged()
+                }
+
+            alerta.show() // Ahora muestra el AlertDialog
+
+            //////////////////////////////////////////////
+
+
+            // Aquí es donde eliminamos el ítem
+            //personaViewModel.borrar(persona)
+
+            // Mostrar Snackbar para deshacer la eliminación
+//            Snackbar.make(this@BaseDatosActivity.binding.recview, "Persona eliminada", Snackbar.LENGTH_LONG)
+//                .setAction("Deshacer") {
+//                    // Si el usuario quiere deshacer, simplemente reinsertamos el ítem
+//                    personaViewModel.insertar(persona)
+//                }
+//                .show()
+        }
+
+        // para Borrar una fila con su registro del recicler
+        // y de la base de datos
+        // si se toca deslizando hacia la izquierda
+        override fun onChildDraw(
+            c: Canvas,
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            dX: Float, // desplazamiento horizontal
+            dY: Float,
+            actionState: Int,
+            isCurrentlyActive: Boolean
+        ) {
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+
+            // Solo aplicar si se está deslizando hacia la izquierda
+            if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE && dX < 0) {
+                val itemView = viewHolder.itemView
+                val paint = Paint()
+                paint.color = Color.RED
+
+                // Dibuja el fondo rojo
+                c.drawRect(
+                    itemView.right.toFloat() + dX, // izquierda del fondo
+                    itemView.top.toFloat(),
+                    itemView.right.toFloat(),      // derecha del fondo
+                    itemView.bottom.toFloat(),
+                    paint
+                )
+
+                // Carga el icono
+                val deleteIcon =
+                    ContextCompat.getDrawable(recyclerView.context, R.drawable.ic_delete)
+                val iconMargin = 32
+                val iconSize = 64
+
+                deleteIcon?.let {
+                    val iconTop = itemView.top + (itemView.height - iconSize) / 2
+                    val iconLeft = itemView.right - iconMargin - iconSize
+                    val iconRight = itemView.right - iconMargin
+                    val iconBottom = iconTop + iconSize
+
+                    it.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                    it.draw(c)
+
+                    // 3. Texto "Eliminar"
+                    val text = "Eliminar"
+                    val textPaint = Paint()
+                    textPaint.color = Color.WHITE
+                    textPaint.textSize = 40f
+                    textPaint.isAntiAlias = true
+                    textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+
+                    // Calcular ancho del texto
+                    val textWidth = textPaint.measureText(text)
+
+                    // Dibujar texto a la izquierda del ícono
+                    val textX = iconLeft - textWidth - 20f
+                    val textY = itemView.top + itemView.height / 2f + 15f // Ajuste vertical
+
+                    c.drawText(text, textX, textY, textPaint)
+                }
+            }
+        }
+    }
+
 }
