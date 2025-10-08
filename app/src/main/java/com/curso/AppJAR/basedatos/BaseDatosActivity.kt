@@ -110,36 +110,39 @@ class BaseDatosActivity : AppCompatActivity() {
 
     }
 
+    // para generar numero aleatorio
+    fun generarNumeroAleatorio(): Int {
+        return (1..100).random()
+    }
+
+    // para generar nombrea aleatorios
+    fun generarNombre(): String {
+        val silabas = listOf(
+            "ma", "ri", "an", "jo", "se", "la", "lu", "mi", "el", "no",
+            "da", "na", "so", "le", "pe", "ro", "car", "al", "be", "vi"
+        )
+
+        val cantidadSilabas = (2..3).random() // nombres de 2 o 3 sílabas
+
+        val nombre = StringBuilder()
+        repeat(cantidadSilabas) {
+            nombre.append(silabas.random())
+        }
+
+        // Capitalizar la primera letra
+        return nombre.toString().replaceFirstChar { it.uppercaseChar() }
+    }
+
     // llamamos al ViewModel desde la funcion insertarPersona
     fun insertarPersona(view: View) {
-        personaViewModel.insertar(Persona(nombre="Andrés", edad=25))
+        personaViewModel.insertar(Persona(nombre=generarNombre(), edad=generarNumeroAleatorio()))
         personaViewModel.contarPersonas()
     }
 
-    fun alertaborrado(): Boolean {
-
-        // prepara el AlertDialog
-        var alerta = AlertDialog.Builder(this)
-            .setTitle("Atención") // i18n
-            .setMessage("¿Desea Eliminar el registro?") // i18n
-            .setIcon(R.drawable.outline_chevron_forward_24)
-            .setPositiveButton(R.string.boton_si){ dialogo, opcion ->
-                this.finish();
-            }
-            .setNegativeButton(R.string.boton_no){ dialogo: DialogInterface, opcion: Int ->
-                dialogo.dismiss()
-            }
-            .setNeutralButton (R.string.boton_neutro){ dialogo: DialogInterface, opcion: Int ->
-                dialogo.cancel()
-            }
-
-        alerta.show() // Ahora muestra el AlertDialog
-
-        return true
-    }
-
-
-    val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+    // solo lee el envento a la izquierda
+    //val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT)
+    // leo el envento a la izquierda y derecha
+    val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
         override fun onMove(
             recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder
         ): Boolean {
@@ -150,51 +153,50 @@ class BaseDatosActivity : AppCompatActivity() {
             val position = viewHolder.adapterPosition
             val persona = this@BaseDatosActivity.adapterPersonas.listaPersonas[position] // Método que debes crear en tu adaptador
 
+            // de izquierda a derecha
+            if (direction == ItemTouchHelper.LEFT) {
+                // INICIO ALERTA////////////////////////////////////////////
+                // prepara el AlertDialog
+                var alerta = AlertDialog.Builder(this@BaseDatosActivity)
+                    .setTitle("Atención") // i18n
+                    .setMessage("¿Desea Eliminar el registro?") // i18n
+                    .setIcon(R.drawable.outline_chevron_forward_24)
+                    .setPositiveButton(R.string.boton_si){ dialogo, opcion ->
+                        // Aquí es donde eliminamos el ítem
+                        personaViewModel.borrar(persona)
 
-            //////////////////////////////////////////////
-            // prepara el AlertDialog
-            var alerta = AlertDialog.Builder(this@BaseDatosActivity)
-                .setTitle("Atención") // i18n
-                .setMessage("¿Desea Eliminar el registro?") // i18n
-                .setIcon(R.drawable.outline_chevron_forward_24)
-                .setPositiveButton(R.string.boton_si){ dialogo, opcion ->
-                    // Aquí es donde eliminamos el ítem
-                    personaViewModel.borrar(persona)
+                        // Mostrar Snackbar para deshacer la eliminación
+                        Snackbar.make(this@BaseDatosActivity.binding.recview, "Persona eliminada", Snackbar.LENGTH_LONG)
+                            .setAction("Deshacer") {
+                                // Si el usuario quiere deshacer, simplemente reinsertamos el ítem
+                                personaViewModel.insertar(persona)
+                            }
+                            .show()
+                    }
+                    .setNegativeButton(R.string.boton_no){ dialogo: DialogInterface, opcion: Int ->
+                        dialogo.dismiss()
+                        // con esto repinto el recicler a lo bestia
+                        //adapterPersonas.notifyDataSetChanged()
+                        adapterPersonas.notifyItemChanged(position)
+                    }
+                    .setNeutralButton (R.string.boton_neutro){ dialogo: DialogInterface, opcion: Int ->
+                        dialogo.cancel()
+                        // con esto repinto el recicler a lo bestia
+                        //adapterPersonas.notifyDataSetChanged()
+                        adapterPersonas.notifyItemChanged(position)
+                    }
 
-                    // Mostrar Snackbar para deshacer la eliminación
-                    Snackbar.make(this@BaseDatosActivity.binding.recview, "Persona eliminada", Snackbar.LENGTH_LONG)
-                        .setAction("Deshacer") {
-                            // Si el usuario quiere deshacer, simplemente reinsertamos el ítem
-                            personaViewModel.insertar(persona)
-                        }
-                        .show()
-                }
-                .setNegativeButton(R.string.boton_no){ dialogo: DialogInterface, opcion: Int ->
-                    dialogo.dismiss()
-                    // con esto repinto el recicler a lo bestia
-                    adapterPersonas.notifyDataSetChanged()
-                }
-                .setNeutralButton (R.string.boton_neutro){ dialogo: DialogInterface, opcion: Int ->
-                    dialogo.cancel()
-                    // con esto repinto el recicler a lo bestia
-                    adapterPersonas.notifyDataSetChanged()
-                }
+                alerta.show() // Ahora muestra el AlertDialog
+                 // FIN ALERTA ////////////////////////////////////////////
+            }
+            // de derecha a izquierda
+            else if (direction == ItemTouchHelper.RIGHT) {
+                Log.d(Constantes.ETIQUETA_LOG, "Se está deslizando hacia la izquierda")
+                this@BaseDatosActivity.binding.textView.text = persona.nombre
+                this@BaseDatosActivity.binding.textView2.text = persona.edad.toString()
+                adapterPersonas.notifyDataSetChanged()
+            }
 
-            alerta.show() // Ahora muestra el AlertDialog
-
-            //////////////////////////////////////////////
-
-
-            // Aquí es donde eliminamos el ítem
-            //personaViewModel.borrar(persona)
-
-            // Mostrar Snackbar para deshacer la eliminación
-//            Snackbar.make(this@BaseDatosActivity.binding.recview, "Persona eliminada", Snackbar.LENGTH_LONG)
-//                .setAction("Deshacer") {
-//                    // Si el usuario quiere deshacer, simplemente reinsertamos el ítem
-//                    personaViewModel.insertar(persona)
-//                }
-//                .show()
         }
 
         // para Borrar una fila con su registro del recicler
@@ -211,7 +213,7 @@ class BaseDatosActivity : AppCompatActivity() {
         ) {
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
 
-            // Solo aplicar si se está deslizando hacia la izquierda
+            // deslizamiento de DERECHA A IZQUIERDA
             if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE && dX < 0) {
                 val itemView = viewHolder.itemView
                 val paint = Paint()
@@ -259,6 +261,57 @@ class BaseDatosActivity : AppCompatActivity() {
                     c.drawText(text, textX, textY, textPaint)
                 }
             }
+            // DESLIZAMIENTO DE DERECHA A IZQUIERDA
+            else if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE && dX > 0) {
+                val itemView = viewHolder.itemView
+                val paint = Paint()
+                paint.color = Color.YELLOW
+
+                // Dibuja el fondo rojo
+                c.drawRect(
+                    // marhen Izquierdo
+                    itemView.left.toFloat(), // izquierda del fondo
+                    itemView.top.toFloat(),
+                    //margen derecho
+                    itemView.left.toFloat() + dX,      // derecha del fondo
+                    itemView.bottom.toFloat(),
+                    paint
+                )
+
+                // Carga el icono
+                val favIcon =
+                    ContextCompat.getDrawable(recyclerView.context, R.drawable.outline_bookmark_heart_24)
+                val iconMargin = 32
+                val iconSize = 64
+
+                favIcon?.let {
+                    val iconTop = itemView.top + (itemView.height - iconSize) / 2
+                    val iconLeft = itemView.left + iconMargin
+                    val iconRight = itemView.left + iconMargin + iconSize
+                    val iconBottom = iconTop + iconSize
+
+                    it.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                    it.draw(c)
+
+                    // 3. Texto "Favorito"
+                    val text = "Favorito"
+                    val textPaint = Paint()
+                    textPaint.color = Color.BLACK
+                    textPaint.textSize = 40f
+                    textPaint.isAntiAlias = true
+                    textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+
+                    // Calcular ancho del texto
+                    val textWidth = textPaint.measureText(text)
+
+                    // Dibujar texto a la izquierda del ícono
+                    val textX = iconLeft + iconMargin+iconSize + 20f
+                    val textY = itemView.top + itemView.height / 2f + 15f // Ajuste vertical
+
+                    c.drawText(text, textX, textY, textPaint)
+                }
+            }
+
         }
     }
 
