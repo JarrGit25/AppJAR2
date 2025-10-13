@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <!-- declaro que mi app necesita conectarse a internet -->
     <uses-permission android:name="android.permission.INTERNET" /> <!-- PARA ACCEDER AL ESTADO DE LA RED -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- PERMISO PARA PODER LEER LOS CONTACTOS -->
@@ -10,6 +9,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.READ_CONTACTS" /> <!-- PERMISOS PARA ACCEDRR A LA CAMARA DE FOTOS -->
     <uses-permission android:name="android.permission.CAMERA" /> <!-- required = true si el dispositivo tiene que tener camara obligatoriamente -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- permitimos que nuesta app se informe del inicio del dispositivo -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" /> <!-- dicen q no existe pero te quita el rojo en AS añado por siacaso necesario para poco -->
@@ -38,8 +38,6 @@
         </intent>
     </queries>
 
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -51,9 +49,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppJAR">
         <activity
+            android:name=".realtimedatabase.InsertarClientesFirebaseActivity"
+            android:exported="false" />
+        <activity
+            android:name=".authfirebase.RegistroActivity"
+            android:exported="false" />
+        <activity
+            android:name=".authfirebase.AuthenticationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".authfirebase.MenuAuthActivity"
+            android:exported="false" />
+        <activity
             android:name=".basedatos.BaseDatosActivity"
             android:exported="false" />
-
         <activity
             android:name=".alarma.AjusteAlarmaActivity"
             android:exported="false" />
@@ -77,13 +86,13 @@
         <receiver
             android:name=".receptor.FinServicioReceiver"
             android:enabled="true"
-            android:exported="true"/>
+            android:exported="true" />
 
         <service
             android:name=".servicios.NumAleatorioService"
             android:enabled="true"
             android:exported="true"
-            android:foregroundServiceType="dataSync"/>
+            android:foregroundServiceType="dataSync" />
 
         <activity
             android:name=".memorygame.MemoryGameActivity"

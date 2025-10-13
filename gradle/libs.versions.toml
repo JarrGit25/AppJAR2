@@ -26,6 +26,7 @@ lifecycleLivedata = "2.9.3"
 roomCommon = "2.7.2"
 roomCompiler = "2.7.2"
 roomKtxVersion = "2.7.2"
+firebaseAuthKtx = "24.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

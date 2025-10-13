@@ -24,6 +24,7 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import com.curso.AppJAR.authfirebase.MenuAuthActivity
 import com.curso.AppJAR.basedatos.BaseDatosActivity
 import com.curso.AppJAR.biometrico.HuellaActivity
 import com.curso.AppJAR.canciones.BusquedaCancionesActivity
@@ -35,6 +36,7 @@ import com.curso.AppJAR.lista.ListaUsuariosActivity
 import com.curso.AppJAR.mapa.MapsActivity
 import com.curso.AppJAR.perros.PerrosActivity
 import com.curso.AppJAR.productos.ListaProductosActivity
+import com.curso.AppJAR.realtimedatabase.InsertarClientesFirebaseActivity
 import com.curso.AppJAR.servicios.PlayActivity
 import com.curso.AppJAR.tabs.TabsActivity
 import com.curso.AppJAR.worker.MiTareaProgramada
@@ -280,6 +282,16 @@ class MainMenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSel
             27 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
                 val intent = Intent(this, BaseDatosActivity::class.java)
+                startActivity(intent)
+            }
+            28 -> {
+                Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
+                val intent = Intent(this, MenuAuthActivity::class.java)
+                startActivity(intent)
+            }
+            29 -> {
+                Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
+                val intent = Intent(this, InsertarClientesFirebaseActivity::class.java)
                 startActivity(intent)
             }
 
