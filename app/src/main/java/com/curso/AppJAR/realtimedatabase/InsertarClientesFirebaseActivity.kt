@@ -125,7 +125,71 @@ class InsertarClientesFirebaseActivity : AppCompatActivity() {
 
 
     }
-    fun borrarPorNombre (nombre:String){}
+
+    /*
+    ojo porque para borrar por nombre u otro campo, hay que crear en la base de datos
+    un índice previmanete, para poder consultar por ese campo, en la sección de rules tipo así
+
+    {
+  "rules": {
+    ".read": "now < 1762642800000",  // 2025-11-9
+    ".write": "now < 1762642800000",  // 2025-11-9
+    "clientes": {
+      ".indexOn": ["nombre"]    // Agrega un índice para el campo 'nombre'
+    }
+
+  }
+}
+     */
+    fun borrarPorNombre (nombre:String){
+
+        val dbRef = FirebaseDatabase.getInstance(URL_REAL_TIME_DATABASE).getReference("clientes")
+        // Configurar la consulta para obtener clientes con un nombre específico
+        val query = dbRef.orderByChild("nombre").equalTo(nombre)
+
+        query.get().addOnSuccessListener { snapshot ->
+            snapshot.children.forEach { childSnapshot ->
+                // Eliminar cada cliente que coincida con el nombre
+                childSnapshot.ref.removeValue()
+                    .addOnSuccessListener {
+                        Log.d(Constantes.ETIQUETA_LOG, "Cliente ${childSnapshot.key} eliminado.")
+                        contarClientesRestantes()
+                    }
+                    .addOnFailureListener {
+                        Log.d(Constantes.ETIQUETA_LOG, "Error al eliminar cliente")
+                    }
+            }
+        }.addOnFailureListener {
+
+            Log.e(Constantes.ETIQUETA_LOG, " Error al realizar la consulta. $it")
+        }
+
+
+    }
+
+    private fun contarClientesRestantes() {
+        val dbRef = FirebaseDatabase.getInstance(URL_REAL_TIME_DATABASE).getReference("clientes")
+        dbRef.get().addOnSuccessListener { snapshot ->
+            val totClientes = snapshot.childrenCount
+            Log.d(Constantes.ETIQUETA_LOG, "Hay $totClientes clientes después de la eliminación.")
+        }.addOnFailureListener {
+            Log.e(Constantes.ETIQUETA_LOG, "Error al contar los clientes restantes: $it")
+        }
+    }
+
+    fun borrarUltimoPorNombre(view: View) {
+
+        if (listaClientes.size>0)
+        {
+            val nombre = listaClientes.get(listaClientes.size-1).nombre
+            Log.d(Constantes.ETIQUETA_LOG, "Borrar por nombre = $nombre")
+            borrarPorNombre(nombre)
+
+        } else {
+            Log.d(Constantes.ETIQUETA_LOG, "Sin clientes que borrar")
+            Toast.makeText(this, "Sin clientes que borrar/n Clique mostrar primero", Toast.LENGTH_LONG).show()
+        }
+    }
 
 
 }
