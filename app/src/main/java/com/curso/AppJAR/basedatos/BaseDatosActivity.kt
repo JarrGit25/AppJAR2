@@ -19,10 +19,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.curso.AppJAR.Constantes
 import com.curso.AppJAR.R
 import com.curso.AppJAR.basedatos.adapter.AdapterPersonas
+import com.curso.AppJAR.basedatos.entity.Empleo
 import com.curso.AppJAR.basedatos.entity.Persona
+import com.curso.AppJAR.basedatos.entity.PersonaConDetalles
 import com.curso.AppJAR.basedatos.viewmodel.PersonaViewModel
 import com.curso.AppJAR.databinding.ActivityBaseDatosBinding
 import com.google.android.material.snackbar.Snackbar
+import java.util.Date
 
 /*
 1 ) //añadimos esta línea en plugins del gradle del proyecto manualmente
@@ -74,8 +77,8 @@ La estructura Quedaría : 	basedatos (carpeta)
 
 class BaseDatosActivity : AppCompatActivity() {
     //para la lista de personas debe ser mutable para poderse modificar
-    val personas:MutableList<Persona> = mutableListOf()
-
+    //val personas:MutableList<Persona> = mutableListOf()
+    var personas:MutableList<PersonaConDetalles> = mutableListOf()//creamos la lista de personas vacía
     lateinit var binding: ActivityBaseDatosBinding
     lateinit var adapterPersonas: AdapterPersonas
     // crea la instancia del ViewModel y la enlaza a la actividad
@@ -98,15 +101,43 @@ class BaseDatosActivity : AppCompatActivity() {
         itemTouchHelper.attachToRecyclerView(binding.recview)
 
         //ligamos las actualizaciones autómaticas de la lista
-        personaViewModel.personas.observe(this, Observer {
+        personaViewModel.personasDetalles.observe(this, Observer {
             personas ->
             //Log.d(Constantes.ETIQUETA_LOG, "Personas = $personas")
             personas?.let {
                 Log.d(Constantes.ETIQUETA_LOG, "Personas (${personas.size}) = $personas")
                 adapterPersonas.listaPersonas = it
-                adapterPersonas.notifyDataSetChanged()
+                //   TODO deberíamos controlar si la lista se ha actualizado por borrar
+                //   o por insertar y en qué posición, para así usar
+                //    notifyItemRemoved(posicion_elemento_eliminado);
+                // o notifyItemInserted(posicion_elemento_insertado);
+                // y repintar sólo esa posición de la fila
+                // adapterPersonas.notifyDataSetChanged()
+                when (personaViewModel.ultimaOperacionBD)
+                {
+                    UltimaOperacionBD.INSERTAR -> {
+                        adapterPersonas.notifyItemInserted(personaViewModel.posicionAfectada)
+                        //adapterPersonas.notifyDataSetChanged()
+                        Log.d(Constantes.ETIQUETA_LOG, "Lista actualizada tras INSERCIÓN en pos ${personaViewModel.posicionAfectada}")
+                    }
+                    UltimaOperacionBD.BORRAR -> {
+                        adapterPersonas.notifyItemRemoved (personaViewModel.posicionAfectada)
+                        Log.d(Constantes.ETIQUETA_LOG, "Lista actualizada tras BORRADO en pos ${personaViewModel.posicionAfectada}")}
+                    UltimaOperacionBD.NINGUNA -> {
+                        adapterPersonas.notifyDataSetChanged()
+                        Log.d(Constantes.ETIQUETA_LOG, "Lista actualizada sin inserción ni borrado")
+                    }
+                }
+                personaViewModel.ultimaOperacionBD = UltimaOperacionBD.NINGUNA//actualizamos
             }
         })
+
+    }
+
+    fun insertarPersonaYEmpleo(view: View) {
+        val personaAux = Persona(nombre =generarNombre(), edad =generarNumeroAleatorio())
+        val empleoAux = Empleo(0, 0, "BARRANDERO", Date(), 1500.0, Empleo.TipoContrato.TEMPORAL)
+        personaViewModel.insertarPersonaYEmpleo(personaAux, personaViewModel.personasDetalles.value!!.size, empleoAux)
 
     }
 
@@ -135,7 +166,7 @@ class BaseDatosActivity : AppCompatActivity() {
 
     // llamamos al ViewModel desde la funcion insertarPersona
     fun insertarPersona(view: View) {
-        personaViewModel.insertar(Persona(nombre=generarNombre(), edad=generarNumeroAleatorio()))
+        personaViewModel.insertar(Persona(nombre=generarNombre(), edad=generarNumeroAleatorio()), personaViewModel.personasDetalles.value!!.size)
         personaViewModel.contarPersonas()
     }
 
@@ -151,7 +182,8 @@ class BaseDatosActivity : AppCompatActivity() {
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             val position = viewHolder.adapterPosition
-            val persona = this@BaseDatosActivity.adapterPersonas.listaPersonas[position] // Método que debes crear en tu adaptador
+            val persona = this@BaseDatosActivity.adapterPersonas.listaPersonas[position].persona // Método que debes crear en tu adaptador
+            val empleo = this@BaseDatosActivity.adapterPersonas.listaPersonas[position].empleo
 
             // de izquierda a derecha
             if (direction == ItemTouchHelper.LEFT) {
@@ -163,13 +195,13 @@ class BaseDatosActivity : AppCompatActivity() {
                     .setIcon(R.drawable.outline_chevron_forward_24)
                     .setPositiveButton(R.string.boton_si){ dialogo, opcion ->
                         // Aquí es donde eliminamos el ítem
-                        personaViewModel.borrar(persona)
+                        personaViewModel.borrar(persona, position)
 
                         // Mostrar Snackbar para deshacer la eliminación
                         Snackbar.make(this@BaseDatosActivity.binding.recview, "Persona eliminada", Snackbar.LENGTH_LONG)
                             .setAction("Deshacer") {
                                 // Si el usuario quiere deshacer, simplemente reinsertamos el ítem
-                                personaViewModel.insertar(persona)
+                                personaViewModel.insertarPersonaYEmpleo(persona, position, empleo!!)
                             }
                             .show()
                     }

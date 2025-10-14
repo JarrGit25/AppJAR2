@@ -3,10 +3,10 @@ package com.curso.AppJAR.basedatos.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.curso.AppJAR.basedatos.entity.Persona
+import com.curso.AppJAR.basedatos.entity.PersonaConDetalles
 import com.curso.AppJAR.databinding.FilaPersonaBinding
 
-class AdapterPersonas (var listaPersonas:List<Persona>): RecyclerView.Adapter<PersonaVH>() {
+class AdapterPersonas (var listaPersonas:List<PersonaConDetalles>): RecyclerView.Adapter<PersonaVH>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PersonaVH {
         val filaPersona = FilaPersonaBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return PersonaVH(filaPersona)
