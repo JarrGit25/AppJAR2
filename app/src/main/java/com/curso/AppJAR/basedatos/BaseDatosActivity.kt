@@ -13,6 +13,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,7 +25,9 @@ import com.curso.AppJAR.basedatos.entity.Persona
 import com.curso.AppJAR.basedatos.entity.PersonaConDetalles
 import com.curso.AppJAR.basedatos.viewmodel.PersonaViewModel
 import com.curso.AppJAR.databinding.ActivityBaseDatosBinding
+import com.curso.AppJAR.util.LogUtil
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
 import java.util.Date
 
 /*
@@ -92,7 +95,7 @@ class BaseDatosActivity : AppCompatActivity() {
         binding = ActivityBaseDatosBinding.inflate((layoutInflater))
         setContentView(binding.root)
 
-        adapterPersonas = AdapterPersonas(personas)
+        adapterPersonas = AdapterPersonas(personas, ::clickFila)
         binding.recview.adapter = adapterPersonas
         binding.recview.layoutManager = LinearLayoutManager(this)
 
@@ -346,5 +349,16 @@ class BaseDatosActivity : AppCompatActivity() {
 
         }
     }
+
+    fun clickFila (personaConDetalles: PersonaConDetalles)
+    {
+        Log.d(Constantes.ETIQUETA_LOG, "Tocado fila $personaConDetalles desde la Activity :)")
+        lifecycleScope.launch {
+            var par = personaViewModel.obtenerCochesPersona(personaConDetalles.persona.id)
+            Log.d(Constantes.ETIQUETA_LOG, "${LogUtil.getLogInfo()} Persona con id = ${par.first}")
+            Log.d(Constantes.ETIQUETA_LOG, "${LogUtil.getLogInfo()} Coches = ${par.second}")
+            }
+    }
+
 
 }

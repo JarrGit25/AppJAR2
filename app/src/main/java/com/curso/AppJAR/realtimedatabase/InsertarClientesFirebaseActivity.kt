@@ -112,6 +112,7 @@ class InsertarClientesFirebaseActivity : AppCompatActivity() {
                     .addOnSuccessListener {
                         Log.d(Constantes.ETIQUETA_LOG, "Cliente eliminado")
                         listaClientes.removeAt(listaClientes.size-1)
+                        Toast.makeText(this, "CLIENTE ELIMINADO", Toast.LENGTH_LONG).show()
                     }
                     .addOnFailureListener { e ->
                         Log.e(Constantes.ETIQUETA_LOG, "Error: ${e.message}")
@@ -120,6 +121,7 @@ class InsertarClientesFirebaseActivity : AppCompatActivity() {
             }
         } else {
             Log.d(Constantes.ETIQUETA_LOG, "Sin clientes que borrar")
+            Toast.makeText(this, "Sin clientes que borrar/n Clique mostrar primero", Toast.LENGTH_LONG).show()
         }
 
 
@@ -153,7 +155,6 @@ class InsertarClientesFirebaseActivity : AppCompatActivity() {
                 childSnapshot.ref.removeValue()
                     .addOnSuccessListener {
                         Log.d(Constantes.ETIQUETA_LOG, "Cliente ${childSnapshot.key} eliminado.")
-                        contarClientesRestantes()
                     }
                     .addOnFailureListener {
                         Log.d(Constantes.ETIQUETA_LOG, "Error al eliminar cliente")
@@ -165,16 +166,6 @@ class InsertarClientesFirebaseActivity : AppCompatActivity() {
         }
 
 
-    }
-
-    private fun contarClientesRestantes() {
-        val dbRef = FirebaseDatabase.getInstance(URL_REAL_TIME_DATABASE).getReference("clientes")
-        dbRef.get().addOnSuccessListener { snapshot ->
-            val totClientes = snapshot.childrenCount
-            Log.d(Constantes.ETIQUETA_LOG, "Hay $totClientes clientes después de la eliminación.")
-        }.addOnFailureListener {
-            Log.e(Constantes.ETIQUETA_LOG, "Error al contar los clientes restantes: $it")
-        }
     }
 
     fun borrarUltimoPorNombre(view: View) {
@@ -190,6 +181,45 @@ class InsertarClientesFirebaseActivity : AppCompatActivity() {
             Toast.makeText(this, "Sin clientes que borrar/n Clique mostrar primero", Toast.LENGTH_LONG).show()
         }
     }
+
+    fun actualizarPorId (view: View)
+    {
+        if (listaClientes.size>0)
+        {
+            var cliente = listaClientes.get(listaClientes.size-1)
+            val dbRef = FirebaseDatabase.getInstance(URL_REAL_TIME_DATABASE).getReference("clientes")
+            // Configurar la consulta para obtener clientes con un nombre específico
+            cliente.edad = cliente.edad+1
+            dbRef.child(cliente.clave).setValue(cliente)
+                .addOnSuccessListener {
+                    Log.d(Constantes.ETIQUETA_LOG, "Cliente actualizado")
+                    Toast.makeText(this, "Cliente actualizado", Toast.LENGTH_LONG).show()
+                }
+                .addOnFailureListener{
+                    Log.e(Constantes.ETIQUETA_LOG, "Error al actualizar cliente $it", it)
+                    Toast.makeText(this, "Error al actualizar cliente", Toast.LENGTH_LONG).show()
+                }
+
+        } else {
+            Log.d(Constantes.ETIQUETA_LOG, "Sin clientes para actualizar")
+            Toast.makeText(this, "Sin clientes que actualizar/n Clique mostrar primero", Toast.LENGTH_LONG).show()
+        }
+
+    }
+
+    //TODO actualizar por nombre
+    /*
+
+database.child("users").child(userId).setValue(user)
+    .addOnSuccessListener {
+        // Write was successful!
+        // ...
+    }
+    .addOnFailureListener {
+        // Write failed
+        // ...
+    }
+     */
 
 
 }
