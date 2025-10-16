@@ -6,8 +6,12 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.curso.AppJAR.Constantes
+import com.curso.AppJAR.basedatos.UltimaOperacionBD
 import com.curso.AppJAR.basedatos.db.AppDatabase
+import com.curso.AppJAR.basedatos.entity.Coche
+import com.curso.AppJAR.basedatos.entity.Empleo
 import com.curso.AppJAR.basedatos.entity.Persona
+import com.curso.AppJAR.basedatos.entity.PersonaConDetalles
 import com.curso.AppJAR.basedatos.repository.Repositorio
 import kotlinx.coroutines.launch
 
@@ -19,35 +23,56 @@ import kotlinx.coroutines.launch
     le pasamos el contexto com parametro a la clase que es el contexto Application
  */
 
-class PersonaViewModel(application: Application):AndroidViewModel(application)
-{
-        private val repository: Repositorio
-        val personas: LiveData<List<Persona>>
+//fun insertar se ejecuta en el ambito de la corrutina de forma asincrona en segundo plano
 
-        // hace de constructor
-        // recupera una instancia de la base de Datos de Persona Dao y trae Todas las Personas
-        init {
-            val dao = AppDatabase.getDatabase(application).personaDao()
-            repository = Repositorio(dao)
-            personas = repository.todasLasPersonaDao
-        }
+class PersonaViewModel(application: Application):AndroidViewModel(application) {
 
-        /*fun insertar(persona: Persona) = viewModelScope.launch {
+    private val repository: Repositorio
+    //val personas: LiveData<List<Persona>>
+    val personasDetalles: LiveData<List<PersonaConDetalles>>
+    lateinit var ultimaOperacionBD:UltimaOperacionBD
+    var posicionAfectada:Int = -1
+
+    init {
+
+        val personaDao = AppDatabase.getDatabase(application).personaDao()
+        val empleoDao = AppDatabase.getDatabase(application).empleoDao()
+        val cocheDao = AppDatabase.getDatabase(application).cocheDao()
+        repository = Repositorio(personaDao, empleoDao, cocheDao)
+        personasDetalles = repository.todasLasPersonas
+        //personas = repository.todasLasPersonas
+        ultimaOperacionBD = UltimaOperacionBD.NINGUNA
+    }
+
+    /*fun insertar(persona: Persona) = viewModelScope.launch {
+        repository.insertar(persona)
+    }*/
+
+    fun insertar(persona: Persona, pos:Int) {
+        viewModelScope.launch {
             repository.insertar(persona)
-        }*/
-
-        // se ejecuta en el ambito de la corrutina de forma asincrona en segundo plano
-        fun insertar(persona: Persona) {
-            viewModelScope.launch {
-                repository.insertar(persona)
-            }
+            ultimaOperacionBD = UltimaOperacionBD.INSERTAR
+            posicionAfectada = pos
         }
 
-        fun borrar(persona: Persona) {
-            viewModelScope.launch {
-                repository.borrar(persona)
-            }
+
+    }
+
+    fun insertarPersonaYEmpleo(persona: Persona, pos:Int, empleo: Empleo) {
+        viewModelScope.launch {
+            repository.insertarPersonaYEmpleo(persona, empleo)
+            ultimaOperacionBD = UltimaOperacionBD.INSERTAR
+            posicionAfectada = pos
         }
+    }
+
+    fun borrar(persona: Persona, pos:Int) {
+        viewModelScope.launch {
+            repository.borrar(persona)
+            ultimaOperacionBD = UltimaOperacionBD.BORRAR
+            posicionAfectada = pos
+        }
+    }
 
     fun contarPersonas() {
         viewModelScope.launch {
@@ -56,4 +81,9 @@ class PersonaViewModel(application: Application):AndroidViewModel(application)
         }
     }
 
+    suspend fun obtenerCochesPersona(personaId:Int):Pair<Int, List<Coche>>
+    {
+        val listaCoches = repository.leerCochesPersona((personaId))
+        return personaId to listaCoches
+    }
 }

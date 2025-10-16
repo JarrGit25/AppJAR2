@@ -6,6 +6,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.curso.AppJAR.basedatos.entity.Persona
+import com.curso.AppJAR.basedatos.entity.PersonaConDetalles
 
 /*
 Describimpos las operaciones que se pueden realizar
@@ -22,15 +23,24 @@ Son funciones suspend por tanto deben ser suspend
 @Dao
 interface PersonaDao {
     @Insert
-    suspend fun insertar(persona: Persona)
+    suspend fun insertar(persona: Persona):Long
 
     @Delete
     suspend fun borrar(persona: Persona)
 
     // androidx.room
     // tiene que ser de tipo LiveData
-    @Query("SELECT * FROM personas ORDER BY nombre ASC")
-    fun obtenerTodas():LiveData<List<Persona>>
+    // TODO dato curioso de funcionamineto: cuando
+    // se ejecuta un método del dao, se ejecutan
+    // automáticamente los métodos que devuelven LIVEDATA
+    // y su vez, se propagan los cambios a los suscriptores
+    // de ese livedata
+
+    //
+    //@Query("SELECT * FROM personas WHERE id=1")
+    @Query("SELECT * FROM personas ORDER BY id ASC")
+    fun obtenerTodas():LiveData<List<PersonaConDetalles>>
+    //TODO suspend probar
 
     @Query("SELECT COUNT(*) FROM personas")
     suspend fun countPersonas(): Int

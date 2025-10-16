@@ -112,6 +112,7 @@ class InsertarClientesFirebaseActivity : AppCompatActivity() {
                     .addOnSuccessListener {
                         Log.d(Constantes.ETIQUETA_LOG, "Cliente eliminado")
                         listaClientes.removeAt(listaClientes.size-1)
+                        Toast.makeText(this, "CLIENTE ELIMINADO", Toast.LENGTH_LONG).show()
                     }
                     .addOnFailureListener { e ->
                         Log.e(Constantes.ETIQUETA_LOG, "Error: ${e.message}")
@@ -120,12 +121,105 @@ class InsertarClientesFirebaseActivity : AppCompatActivity() {
             }
         } else {
             Log.d(Constantes.ETIQUETA_LOG, "Sin clientes que borrar")
+            Toast.makeText(this, "Sin clientes que borrar/n Clique mostrar primero", Toast.LENGTH_LONG).show()
         }
 
 
 
     }
-    fun borrarPorNombre (nombre:String){}
+
+    /*
+    ojo porque para borrar por nombre u otro campo, hay que crear en la base de datos
+    un índice previmanete, para poder consultar por ese campo, en la sección de rules tipo así
+
+    {
+  "rules": {
+    ".read": "now < 1762642800000",  // 2025-11-9
+    ".write": "now < 1762642800000",  // 2025-11-9
+    "clientes": {
+      ".indexOn": ["nombre"]    // Agrega un índice para el campo 'nombre'
+    }
+
+  }
+}
+     */
+    fun borrarPorNombre (nombre:String){
+
+        val dbRef = FirebaseDatabase.getInstance(URL_REAL_TIME_DATABASE).getReference("clientes")
+        // Configurar la consulta para obtener clientes con un nombre específico
+        val query = dbRef.orderByChild("nombre").equalTo(nombre)
+
+        query.get().addOnSuccessListener { snapshot ->
+            snapshot.children.forEach { childSnapshot ->
+                // Eliminar cada cliente que coincida con el nombre
+                childSnapshot.ref.removeValue()
+                    .addOnSuccessListener {
+                        Log.d(Constantes.ETIQUETA_LOG, "Cliente ${childSnapshot.key} eliminado.")
+                    }
+                    .addOnFailureListener {
+                        Log.d(Constantes.ETIQUETA_LOG, "Error al eliminar cliente")
+                    }
+            }
+        }.addOnFailureListener {
+
+            Log.e(Constantes.ETIQUETA_LOG, " Error al realizar la consulta. $it")
+        }
+
+
+    }
+
+    fun borrarUltimoPorNombre(view: View) {
+
+        if (listaClientes.size>0)
+        {
+            val nombre = listaClientes.get(listaClientes.size-1).nombre
+            Log.d(Constantes.ETIQUETA_LOG, "Borrar por nombre = $nombre")
+            borrarPorNombre(nombre)
+
+        } else {
+            Log.d(Constantes.ETIQUETA_LOG, "Sin clientes que borrar")
+            Toast.makeText(this, "Sin clientes que borrar/n Clique mostrar primero", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    fun actualizarPorId (view: View)
+    {
+        if (listaClientes.size>0)
+        {
+            var cliente = listaClientes.get(listaClientes.size-1)
+            val dbRef = FirebaseDatabase.getInstance(URL_REAL_TIME_DATABASE).getReference("clientes")
+            // Configurar la consulta para obtener clientes con un nombre específico
+            cliente.edad = cliente.edad+1
+            dbRef.child(cliente.clave).setValue(cliente)
+                .addOnSuccessListener {
+                    Log.d(Constantes.ETIQUETA_LOG, "Cliente actualizado")
+                    Toast.makeText(this, "Cliente actualizado", Toast.LENGTH_LONG).show()
+                }
+                .addOnFailureListener{
+                    Log.e(Constantes.ETIQUETA_LOG, "Error al actualizar cliente $it", it)
+                    Toast.makeText(this, "Error al actualizar cliente", Toast.LENGTH_LONG).show()
+                }
+
+        } else {
+            Log.d(Constantes.ETIQUETA_LOG, "Sin clientes para actualizar")
+            Toast.makeText(this, "Sin clientes que actualizar/n Clique mostrar primero", Toast.LENGTH_LONG).show()
+        }
+
+    }
+
+    //TODO actualizar por nombre
+    /*
+
+database.child("users").child(userId).setValue(user)
+    .addOnSuccessListener {
+        // Write was successful!
+        // ...
+    }
+    .addOnFailureListener {
+        // Write failed
+        // ...
+    }
+     */
 
 
 }
