@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "683686384701",
+    "project_id": "primero-bf28a",
+    "storage_bucket": "primero-bf28a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:683686384701:android:2a28247a6759b71de20654",
+        "android_client_info": {
+          "package_name": "com.curso.AppJAR"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDAMkChXPQDNhv6N6HbcsaPO_xpCp_beiQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
