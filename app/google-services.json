@@ -13,7 +13,20 @@
           "package_name": "com.curso.AppJAR"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "683686384701-v1k3n6fkik4fsusm0a4v6h99f11ag19c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.curso.AppJAR",
+            "certificate_hash": "1722fa24423d87188bb087fd4727df978288e82f"
+          }
+        },
+        {
+          "client_id": "683686384701-f51c179sgk7u0se3fu48jbta2v6bdh63.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDAMkChXPQDNhv6N6HbcsaPO_xpCp_beiQ"
@@ -21,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "683686384701-f51c179sgk7u0se3fu48jbta2v6bdh63.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

@@ -1,20 +1,24 @@
 package com.curso.AppJAR
 
+import android.Manifest
 import android.annotation.TargetApi
 import android.content.ComponentName
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.MenuItem
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -32,6 +36,7 @@ import com.curso.AppJAR.contactos.SeleccionContactoActivity
 import com.curso.AppJAR.contactos.SeleccionContactoPermisosActivity
 import com.curso.AppJAR.fechayhora.SeleccionFechaYHoraActivity
 import com.curso.AppJAR.foto.FotoActivity
+import com.curso.AppJAR.googleAuth.GoogleAuthActivity
 import com.curso.AppJAR.lista.ListaUsuariosActivity
 import com.curso.AppJAR.mapa.MapsActivity
 import com.curso.AppJAR.perros.PerrosActivity
@@ -39,8 +44,11 @@ import com.curso.AppJAR.productos.ListaProductosActivity
 import com.curso.AppJAR.realtimedatabase.InsertarClientesFirebaseActivity
 import com.curso.AppJAR.servicios.PlayActivity
 import com.curso.AppJAR.tabs.TabsActivity
+import com.curso.AppJAR.util.LogUtil
 import com.curso.AppJAR.worker.MiTareaProgramada
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.messaging.FirebaseMessaging
 import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
 
@@ -79,6 +87,8 @@ class MainMenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSel
         if (!inicio_auto) {
             //PRIMERA VEZ
             solicitarInicioAutomatico()
+            askNotificationPermission()
+
         }
 
         // Inicializo las dos vistas
@@ -99,10 +109,38 @@ class MainMenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSel
         //val intent = Intent(this,ImcActivity::class.java)
         //startActivity(intent)
 
+        //dibujamos con fuente iconográfica
+        val fuente = Typeface.createFromAsset(assets, "fuentepatas.ttf")
+        val mensaje = findViewById<TextView>(R.id.logopatas)
+        mensaje.typeface = fuente
+
         //mostrarAPPSinstaladas()
         gestionarPermisosNotis()
         // lanzarAlarma()
         lanzarWorkManager()
+
+        //Log.d(Constantes.ETIQUETA_LOG, " GOOGLE SERVICE DISPONIBLES = ${GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this)}")
+
+        // CADA CLIENTE/MOVIL/ INSTANCIA DE NUESTRA APP NECESITA UN TOKEN QUE OBITIENE AL REGISTRARSE
+        //CON FIREBASE COMO CLIENTE. OBTENEMOS UN TOKEN
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w(Constantes.ETIQUETA_LOG, "Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            } else {
+                // Get new FCM registration token
+                val token = task.result
+
+                // Log and toast
+                val msg = "TOKEN CREADO PARA NOTIFICACIONES = $token"// getString(R.string.msg_token_fmt, token)
+                Log.d(Constantes.ETIQUETA_LOG, "${LogUtil.getLogInfo()}  $msg")
+                //Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+                //Log.d(Constantes.ETIQUETA_LOG, "Token registro FBCM $token")
+            }
+
+
+        })
+
     }
 
 //    // creo Intent para enviar texto
@@ -294,11 +332,40 @@ class MainMenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSel
                 val intent = Intent(this, InsertarClientesFirebaseActivity::class.java)
                 startActivity(intent)
             }
+            30 -> {
+                Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
+                val intent = Intent(this, GoogleAuthActivity::class.java)
+                startActivity(intent)
+            }
 
         }
 
 
         return true
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            Log.d(Constantes.ETIQUETA_LOG, "Permisos notificaciones concedidos")
+        } else {
+            Log.d(Constantes.ETIQUETA_LOG, "Permisos notificaciones NO concedidos")
+        }
+    }
+
+    /*
+    Metodo para preguntar por notificaciones para firebase a partir de version 13 tiramisu
+    * */
+    private fun askNotificationPermission() {
+        // This is only necessary for API level >= 33 (TIRAMISU)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
+                PackageManager.PERMISSION_GRANTED
+            ) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
     }
 
     fun lanzarWorkManager ()
