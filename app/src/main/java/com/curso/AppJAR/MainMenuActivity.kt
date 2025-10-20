@@ -28,6 +28,7 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import com.curso.AppJAR.actividadDiaria.ActividadDiariaActivity
 import com.curso.AppJAR.authfirebase.MenuAuthActivity
 import com.curso.AppJAR.basedatos.BaseDatosActivity
 import com.curso.AppJAR.biometrico.HuellaActivity
@@ -335,6 +336,11 @@ class MainMenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSel
             30 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
                 val intent = Intent(this, GoogleAuthActivity::class.java)
+                startActivity(intent)
+            }
+            31 -> {
+                Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
+                val intent = Intent(this, ActividadDiariaActivity::class.java)
                 startActivity(intent)
             }
 

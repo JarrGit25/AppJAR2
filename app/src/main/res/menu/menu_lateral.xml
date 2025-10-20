@@ -184,6 +184,12 @@
             android:orderInCategory="30"
             android:title="GOOGLE AUTH"
             />
+        <item
+            android:icon="@drawable/outline_arrow_forward_ios_24"
+            app:showAsAction="always"
+            android:orderInCategory="31"
+            android:title="Actividad Diaria"
+            />
     </menu>
 </item>
     <item android:title="EJERCICIOS AVANZADOS">

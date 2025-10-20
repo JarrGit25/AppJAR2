@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <!-- declaro que mi app necesita conectarse a internet -->
     <uses-permission android:name="android.permission.INTERNET" /> <!-- PARA ACCEDER AL ESTADO DE LA RED -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- PERMISO PARA PODER LEER LOS CONTACTOS -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> <!-- Para usar servicios en primer plano si lo necesitas -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.READ_CONTACTS" /> <!-- PERMISOS PARA ACCEDRR A LA CAMARA DE FOTOS -->
@@ -16,8 +18,15 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- GPS -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- WIFI o RED MOVIL -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
-
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" /> <!-- Para acceder a estadísticas de uso -->
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
+    <!-- Para detectar actividad física (caminar, correr, etc.) -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+   <!-- <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
+-->
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -60,6 +69,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppJAR">
+        <receiver
+            android:name=".actividadDiaria.DeteccionActividadReceiver"
+            android:enabled="true"
+            android:exported="true"></receiver>
+
+        <activity
+            android:name=".actividadDiaria.ActividadDiariaActivity"
+            android:exported="false" />
         <activity
             android:name=".googleAuth.GoogleAuthActivity"
             android:exported="false" />
@@ -98,10 +115,15 @@
         <receiver android:name=".servicios.PlayService$NotificationPlayButtonHandler" />
         <receiver android:name=".servicios.PlayService$NotificationPrevButtonHandler" />
         <receiver android:name=".servicios.PlayService$NotificationSkipButtonHandler" />
+
         <receiver
             android:name=".receptor.FinServicioReceiver"
             android:enabled="true"
             android:exported="true" />
+
+        <receiver android:name=".actividadDiaria.DeteccionActividadReceiver"
+            android:enabled="true"
+            android:exported="false"/>
 
         <service
             android:name=".servicios.NumAleatorioService"
