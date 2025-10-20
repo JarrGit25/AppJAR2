@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Base.Theme.AppJAR" parent="Theme.Material3.DayNight">
+        <!-- Customize your light theme here. -->
+        <!--personalizo el icono de lanzamiento de la app y el fondo -->
+        <item name="android:windowSplashScreenBackground">@color/amarillo</item>
+        <item name="android:windowSplashScreenAnimatedIcon">
+            @drawable/ic_launcher_foreground
+        </item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/mirojo</item>
+        <item name="colorPrimary">@color/miazul</item>
+        <!--<item name="colorSurface">@color/miactionbarcolor</item>-->
+    </style>
+</resources>
