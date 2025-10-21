@@ -2,6 +2,8 @@ package com.curso.AppJAR.animaciones
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.app.ActivityOptions
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -19,6 +21,7 @@ import kotlin.math.hypot
 class RippleYDesaparecerActivity : AppCompatActivity() {
     lateinit var imageView:ImageView
     lateinit var boton:Button
+    lateinit var boton2:Button
     var imagenVisible = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,6 +35,7 @@ class RippleYDesaparecerActivity : AppCompatActivity() {
         }
         this.imageView = findViewById<ImageView>(R.id.imagenAnimada)
         this.boton = findViewById<Button>(R.id.botonRipple)
+        this.boton2 = findViewById<Button>(R.id.botonRipple2)
 
         this.imageView.visibility = View.INVISIBLE
 
@@ -43,6 +47,14 @@ class RippleYDesaparecerActivity : AppCompatActivity() {
                 mostrarImagen()
             }
             imagenVisible = !imagenVisible
+        }
+
+        this.boton2.setOnClickListener {
+            //transito a TransitionActivity
+            val intentTransicion = Intent(this, TransitionActivity::class.java)
+            startActivity(intentTransicion, ActivityOptions.makeSceneTransitionAnimation(this).toBundle())
+            //programáticamente evitamos la transición definida en el tema
+            //startActivity(intentTransicion, null)
         }
     }
 
@@ -88,7 +100,6 @@ class RippleYDesaparecerActivity : AppCompatActivity() {
         imageView.visibility = View.VISIBLE
         anim.duration = 1000
         anim.start()
-
     }
 
 }

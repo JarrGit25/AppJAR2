@@ -29,6 +29,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.curso.AppJAR.actividadDiaria.ActividadDiariaActivity
+import com.curso.AppJAR.animaciones.AndroidPequeActivity
 import com.curso.AppJAR.animaciones.RippleYDesaparecerActivity
 import com.curso.AppJAR.authfirebase.MenuAuthActivity
 import com.curso.AppJAR.basedatos.BaseDatosActivity
@@ -347,6 +348,11 @@ class MainMenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSel
             32 -> {
                 Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
                 val intent = Intent(this, RippleYDesaparecerActivity::class.java)
+                startActivity(intent)
+            }
+            33 -> {
+                Log.d(Constantes.TAG_LOG,"Navegar hacia item $item.order")
+                val intent = Intent(this, AndroidPequeActivity::class.java)
                 startActivity(intent)
             }
 

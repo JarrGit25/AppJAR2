@@ -30,4 +30,19 @@
         app:layout_constraintTop_toBottomOf="@+id/botonRipple"
         android:scaleType="fitXY"
         app:srcCompat="@drawable/emoticono_risa" />
+
+    <Button
+        android:id="@+id/botonRipple2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="128dp"
+        android:text="EFECTO TRANSITION"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imagenAnimada"
+        app:rippleColor="@color/grissuave" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
