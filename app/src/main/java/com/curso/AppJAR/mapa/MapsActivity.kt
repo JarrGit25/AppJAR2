@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
@@ -15,7 +14,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresPermission
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.curso.AppJAR.Constantes
 import com.curso.AppJAR.R
@@ -25,7 +24,6 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
-
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -194,14 +192,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         this.locationRequest.setInterval(5000)
         this.locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
-                if (null != locationResult) {
-                    var ultimaubicacion = locationResult.lastLocation
-                    Log.d(Constantes.ETIQUETA_LOG, "Ultima ubicación = $ultimaubicacion")
-                    this@MapsActivity.fusedLocationProviderClient.removeLocationUpdates(
-                        locationCallback
-
-                    )
-                    this@MapsActivity.mostrarUbicacion(locationResult.lastLocation)
+                locationResult.lastLocation?.let { location ->
+                    Log.d(Constantes.ETIQUETA_LOG, "Última ubicación = $location")
+                    this@MapsActivity.fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+                    this@MapsActivity.mostrarUbicacion(location)
                 }
             }
         }
