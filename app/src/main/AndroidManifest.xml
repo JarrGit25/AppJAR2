@@ -68,9 +68,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppJAR">
         <activity
-            android:theme="@style/Theme.Transiciones"
-            android:name=".animaciones.TransitionActivity"
+            android:name=".animaciones.AnimationActivity"
             android:exported="false" />
+        <activity
+            android:name=".animaciones.TransitionActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Transiciones" />
         <activity
             android:name=".animaciones.AndroidGrandeActivity"
             android:exported="false" />
@@ -78,9 +81,9 @@
             android:name=".animaciones.AndroidPequeActivity"
             android:exported="false" />
         <activity
-            android:theme="@style/Theme.Transiciones"
             android:name=".animaciones.RippleYDesaparecerActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.Transiciones" />
 
         <receiver
             android:name=".actividadDiaria.DeteccionActividadReceiver"

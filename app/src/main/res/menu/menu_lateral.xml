@@ -202,6 +202,12 @@
             android:orderInCategory="33"
             android:title="ANIMACION PEQUE"
             />
+        <item
+            android:icon="@drawable/outline_arrow_forward_ios_24"
+            app:showAsAction="always"
+            android:orderInCategory="34"
+            android:title="ANIMACION"
+            />
     </menu>
 </item>
     <item android:title="EJERCICIOS AVANZADOS">
