@@ -1,0 +1,40 @@
+Parte musical:
+sonido guardar en preferencias y clase aparte para el sonido
+revisar cuando suenan.
+
+Linea de comandos command pront 
+git pull --> traer los cambios
+
+crear rama   splash1
+git checkout -b splash1
+
+añadimos todo lo nuevo a git
+git add .
+
+la descriocion que queremos para hacer el commit
+git commit -m "ejemplo"
+
+Subimos la rama para que se genere la pull request
+git push -u origin aplash1 
+
+
+ahora habria que crear la pull request
+
+
+git pull para actualizar mi rama al final
+
+comando para borrar rama local en git 
+git branch -d 'nombre_rama'
+
+en que rama estoy ? estare en la que tiene el asterisco *
+git branch
+
+
+saltar a la rama master
+git checkout master
+
+
+
+
+
+
