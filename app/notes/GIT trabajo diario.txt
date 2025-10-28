@@ -11,7 +11,7 @@ git checkout -b splash1
 añadimos todo lo nuevo a git
 git add .
 
-la descriocion que queremos para hacer el commit
+la descripcion que queremos para hacer el commit
 git commit -m "ejemplo"
 
 Subimos la rama para que se genere la pull request
@@ -32,6 +32,9 @@ git branch
 
 saltar a la rama master
 git checkout master
+
+traigo la rama master
+git pull origin master
 
 
 
